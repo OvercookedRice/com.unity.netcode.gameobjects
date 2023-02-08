@@ -26,7 +26,7 @@ namespace Unity.Netcode
         /// <item><term><see cref="SceneEventType.Unload"/></term></item>
         /// </list>
         /// </summary>
-        public AsyncOperationHandle AsyncOperation;
+        public AsyncOperation AsyncOperation;
 
         /// <summary>
         /// Will always be set to the current <see cref="Netcode.SceneEventType"/>

@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 public static partial class AddressableSceneUtility
 {
     private static IAddressableSceneBridge addressableBridge;
-    private static IAddressableSceneLoader sceneLoaderBridge;
 
     static partial void RetrieveSceneIndexTable();
     static partial void CreateSceneLoaderBridge();
@@ -90,25 +89,5 @@ public static partial class AddressableSceneUtility
         }
 
         return addressableBridge.GetSceneCount();
-    }
-
-    public static AsyncOperationHandle LoadSceneAsync( string sceneName, LoadSceneMode loadSceneMode )
-    {
-        if ( sceneLoaderBridge == null )
-        {
-            CreateSceneLoaderBridge();
-        }
-
-        return sceneLoaderBridge.LoadSceneAsync( sceneName, loadSceneMode );
-    }
-
-    public static AsyncOperationHandle UnloadSceneAsync( string sceneName, LoadSceneMode loadSceneMode )
-    {
-        if ( sceneLoaderBridge == null )
-        {
-            CreateSceneLoaderBridge();
-        }
-
-        return sceneLoaderBridge.UnloadSceneAsync( sceneName, loadSceneMode );
     }
 }
