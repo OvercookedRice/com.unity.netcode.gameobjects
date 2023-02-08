@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Unity.Netcode
 {
@@ -95,7 +94,7 @@ namespace Unity.Netcode
         internal uint SceneEventId;
 
         private Coroutine m_TimeOutCoroutine;
-        private AsyncOperationHandle m_AsyncOperation;
+        private AsyncOperation m_AsyncOperation;
 
         private NetworkManager m_NetworkManager { get; }
 
@@ -218,16 +217,16 @@ namespace Unity.Netcode
             }
 
             // Return the local scene event's AsyncOperation status
-            return m_AsyncOperation.IsDone;
+            return m_AsyncOperation.isDone;
         }
 
         /// <summary>
         /// Sets the AsyncOperation for the scene load/unload event
         /// </summary>
-        internal void SetAsyncOperation(AsyncOperationHandle asyncOperation)
+        internal void SetAsyncOperation(AsyncOperation asyncOperation)
         {
             m_AsyncOperation = asyncOperation;
-            m_AsyncOperation.Completed += new Action<AsyncOperationHandle>(asyncOp2 =>
+            m_AsyncOperation.completed += new Action<AsyncOperation>(asyncOp2 =>
             {
                 // Don't invoke the callback if the network session is disconnected
                 // during a SceneEventProgress

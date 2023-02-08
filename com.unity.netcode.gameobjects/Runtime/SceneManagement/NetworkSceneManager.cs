@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 
 namespace Unity.Netcode
@@ -339,16 +338,16 @@ namespace Unity.Netcode
         /// </summary>
         private class DefaultSceneManagerHandler : ISceneManagerHandler
         {
-            public AsyncOperationHandle LoadSceneAsync(string sceneName, LoadSceneMode loadSceneMode, SceneEventProgress sceneEventProgress)
+            public AsyncOperation LoadSceneAsync(string sceneName, LoadSceneMode loadSceneMode, SceneEventProgress sceneEventProgress)
             {
-                var operation = AddressableSceneUtility.LoadSceneAsync(sceneName, loadSceneMode);
+                var operation = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
                 sceneEventProgress.SetAsyncOperation(operation);
                 return operation;
             }
 
-            public AsyncOperationHandle UnloadSceneAsync(Scene scene, SceneEventProgress sceneEventProgress)
+            public AsyncOperation UnloadSceneAsync(Scene scene, SceneEventProgress sceneEventProgress)
             {
-                var operation = AddressableSceneUtility.UnloadSceneAsync(scene);
+                var operation = SceneManager.UnloadSceneAsync(scene);
                 sceneEventProgress.SetAsyncOperation(operation);
                 return operation;
             }
