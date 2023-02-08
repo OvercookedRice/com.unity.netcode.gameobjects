@@ -40,7 +40,7 @@ public static partial class AddressableSceneUtility
             return -1;
         }
 
-        return addressableBridge.GetSceneIndexByPath( name );
+        return addressableBridge.GetSceneIndexByPath( path );
     }
 
     public static int GetIndexBySceneNameOrPath( string nameOrPath )
