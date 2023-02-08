@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 
 namespace Unity.Netcode
@@ -26,7 +27,7 @@ namespace Unity.Netcode
         /// <item><term><see cref="SceneEventType.Unload"/></term></item>
         /// </list>
         /// </summary>
-        public AsyncOperation AsyncOperation;
+        public AsyncOperationHandle AsyncOperation;
 
         /// <summary>
         /// Will always be set to the current <see cref="Netcode.SceneEventType"/>
@@ -338,16 +339,16 @@ namespace Unity.Netcode
         /// </summary>
         private class DefaultSceneManagerHandler : ISceneManagerHandler
         {
-            public AsyncOperation LoadSceneAsync(string sceneName, LoadSceneMode loadSceneMode, SceneEventProgress sceneEventProgress)
+            public AsyncOperationHandle LoadSceneAsync(string sceneName, LoadSceneMode loadSceneMode, SceneEventProgress sceneEventProgress)
             {
-                var operation = SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
+                var operation = AddressableSceneUtility.LoadSceneAsync(sceneName, loadSceneMode);
                 sceneEventProgress.SetAsyncOperation(operation);
                 return operation;
             }
 
-            public AsyncOperation UnloadSceneAsync(Scene scene, SceneEventProgress sceneEventProgress)
+            public AsyncOperationHandle UnloadSceneAsync(Scene scene, SceneEventProgress sceneEventProgress)
             {
-                var operation = SceneManager.UnloadSceneAsync(scene);
+                var operation = AddressableSceneUtility.UnloadSceneAsync(scene);
                 sceneEventProgress.SetAsyncOperation(operation);
                 return operation;
             }
@@ -495,11 +496,11 @@ namespace Unity.Netcode
         {
             HashToBuildIndex.Clear();
             BuildIndexToHash.Clear();
-            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+            for (int i = 0; i < AddressableSceneUtility.GetAddressableSceneCount(); i++)
             {
-                var scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+                var scenePath = AddressableSceneUtility.GetPathByIndex(i);
                 var hash = XXHash.Hash32(scenePath);
-                var buildIndex = SceneUtility.GetBuildIndexByScenePath(scenePath);
+                var buildIndex = AddressableSceneUtility.GetIndexByScenePath(scenePath);
 
                 // In the rare-case scenario where a programmatically generated build has duplicate
                 // scene entries, we will log an error and skip the entry
@@ -538,7 +539,7 @@ namespace Unity.Netcode
         {
             if (HashToBuildIndex.ContainsKey(sceneHash))
             {
-                return SceneUtility.GetScenePathByBuildIndex(HashToBuildIndex[sceneHash]);
+                return AddressableSceneUtility.GetPathByIndex(HashToBuildIndex[sceneHash]);
             }
             else
             {
@@ -552,7 +553,7 @@ namespace Unity.Netcode
         /// </summary>
         internal uint SceneHashFromNameOrPath(string sceneNameOrPath)
         {
-            var buildIndex = SceneUtility.GetBuildIndexByScenePath(sceneNameOrPath);
+            var buildIndex = AddressableSceneUtility.GetIndexBySceneNameOrPath(sceneNameOrPath);
             if (buildIndex >= 0)
             {
                 if (BuildIndexToHash.ContainsKey(buildIndex))
@@ -626,7 +627,7 @@ namespace Unity.Netcode
         {
             var validated = true;
             var sceneName = SceneNameFromHash(sceneHash);
-            var sceneIndex = SceneUtility.GetBuildIndexByScenePath(sceneName);
+            var sceneIndex = AddressableSceneUtility.GetIndexBySceneName(sceneName);
             if (VerifySceneBeforeLoading != null)
             {
                 validated = VerifySceneBeforeLoading.Invoke((int)sceneIndex, sceneName, loadSceneMode);
@@ -849,7 +850,7 @@ namespace Unity.Netcode
             }
 
             // Return invalid scene name status if the scene name is invalid
-            if (SceneUtility.GetBuildIndexByScenePath(sceneName) == InvalidSceneNameOrPath)
+            if (AddressableSceneUtility.GetIndexBySceneName(sceneName) == InvalidSceneNameOrPath)
             {
                 Debug.LogError($"Scene '{sceneName}' couldn't be loaded because it has not been added to the build settings scenes in build list.");
                 return new SceneEventProgress(null, SceneEventProgressStatus.InvalidSceneName);
