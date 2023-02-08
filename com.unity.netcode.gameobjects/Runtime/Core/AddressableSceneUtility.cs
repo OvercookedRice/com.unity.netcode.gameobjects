@@ -3,91 +3,66 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
-public static partial class AddressableSceneUtility
+namespace Unity.Netcode
 {
-    private static IAddressableSceneBridge addressableBridge;
-
-    static partial void RetrieveSceneIndexTable();
-    static partial void CreateSceneLoaderBridge();
-
-    public static int GetIndexBySceneName( string name )
+    public static class AddressableSceneUtility
     {
-        if ( addressableBridge == null )
+        private static List<SceneData> sceneDataList;
+
+#region Initializing Data
+        private class SceneData
         {
-            RetrieveSceneIndexTable();
+            public string sceneName;
+            public string scenePath;
+
+            public SceneData( string sceneName, string scenePath )
+            {
+                this.sceneName = sceneName;
+                this.scenePath = scenePath;
+            }
         }
 
-        if ( addressableBridge == null )
+        public static void InitializeSceneDataList()
         {
-            Debug.LogWarning( "Warning: Cannot find any Addressable Scene Bridge!" );
-            return -1;
+            if ( sceneDataList == null )
+            {
+                sceneDataList = new List<SceneData>();
+            }
+
+            sceneDataList.Clear();
         }
 
-        return addressableBridge.GetSceneIndexByName( name );
-    }
-
-    public static int GetIndexByScenePath( string path )
-    {
-        if ( addressableBridge == null )
+        public static void AppendData( string sceneName, string scenePath )
         {
-            RetrieveSceneIndexTable();
+            sceneDataList.Add( new SceneData( sceneName, scenePath ) );
         }
 
-        if ( addressableBridge == null )
+#endregion
+
+        public static int GetIndexBySceneName( string name )
         {
-            Debug.LogWarning( "Warning: Cannot find any Addressable Scene Bridge!" );
-            return -1;
+            return sceneDataList.FindIndex( x => x.sceneName == name );
         }
 
-        return addressableBridge.GetSceneIndexByPath( path );
-    }
-
-    public static int GetIndexBySceneNameOrPath( string nameOrPath )
-    {
-        if ( addressableBridge == null )
+        public static int GetIndexByScenePath( string path )
         {
-            RetrieveSceneIndexTable();
+            return sceneDataList.FindIndex( x => x.scenePath == path );
         }
 
-        if ( addressableBridge == null )
+        public static int GetIndexBySceneNameOrPath( string nameOrPath )
         {
-            Debug.LogWarning( "Warning: Cannot find any Addressable Scene Bridge!" );
-            return -1;
+            return sceneDataList.FindIndex( x => x.sceneName == nameOrPath || x.scenePath == nameOrPath );
         }
 
-        return addressableBridge.GetSceneIndexByNameOrPath( nameOrPath );
-    }
-
-    public static string GetPathByIndex( int index )
-    {
-        if ( addressableBridge == null )
+        public static string GetPathByIndex( int index )
         {
-            RetrieveSceneIndexTable();
+            if ( index < 0 || index >= sceneDataList.Count ) return "";
+            return sceneDataList[ index ].scenePath;
         }
 
-        if ( addressableBridge == null )
+        public static int GetAddressableSceneCount()
         {
-            Debug.LogWarning( "Warning: Cannot find any Addressable Scene Bridge!" );
-            return "";
+            return sceneDataList.Count;
         }
-
-        return addressableBridge.GetScenePathAtIndex( index );
-    }
-
-    public static int GetAddressableSceneCount()
-    {
-        if ( addressableBridge == null )
-        {
-            RetrieveSceneIndexTable();
-        }
-
-        if ( addressableBridge == null )
-        {
-            Debug.LogWarning( "Warning: Cannot find any Addressable Scene Bridge!" );
-            return 0;
-        }
-
-        return addressableBridge.GetSceneCount();
     }
 }
