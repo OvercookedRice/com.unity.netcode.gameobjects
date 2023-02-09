@@ -13,6 +13,8 @@ namespace Unity.Netcode
     [DisallowMultipleComponent]
     public sealed class NetworkObject : MonoBehaviour
     {
+        private static readonly string NullGlobalObjectId = "GlobalObjectId_V1-0-00000000000000000000000000000000-0-0";
+
         [HideInInspector]
         [SerializeField]
         internal uint GlobalObjectIdHash;
@@ -37,7 +39,23 @@ namespace Unity.Netcode
                 return;
             }
 
-            var globalObjectIdString = UnityEditor.GlobalObjectId.GetGlobalObjectIdSlow(this).ToString();
+            string globalObjectIdString = "";
+
+            var correspondingPrefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromOriginalSource( gameObject );
+            if ( correspondingPrefab != null )
+            {
+                string prefabId = GlobalObjectId.GetGlobalObjectIdSlow( correspondingPrefab ).ToString();
+                if ( prefabId != NullGlobalObjectId )
+                {
+                    globalObjectIdString = prefabId;
+                }
+            }
+
+            if ( string.IsNullOrEmpty( globalObjectIdString ) )
+            {
+                globalObjectIdString = UnityEditor.GlobalObjectId.GetGlobalObjectIdSlow(this).ToString();
+            }
+
             GlobalObjectIdHash = XXHash.Hash32(globalObjectIdString);
         }
 #endif // UNITY_EDITOR
