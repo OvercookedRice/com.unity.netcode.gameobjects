@@ -44,7 +44,7 @@ namespace Unity.Netcode
             var correspondingPrefab = UnityEditor.PrefabUtility.GetCorrespondingObjectFromOriginalSource( gameObject );
             if ( correspondingPrefab != null )
             {
-                string prefabId = GlobalObjectId.GetGlobalObjectIdSlow( correspondingPrefab ).ToString();
+                string prefabId = UnityEditor.GlobalObjectId.GetGlobalObjectIdSlow( correspondingPrefab ).ToString();
                 if ( prefabId != NullGlobalObjectId )
                 {
                     globalObjectIdString = prefabId;
